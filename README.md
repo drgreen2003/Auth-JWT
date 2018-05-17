@@ -1,4 +1,4 @@
-# JWT Authentication Mini
+# JWT Authentication
 
 Topics:
 
