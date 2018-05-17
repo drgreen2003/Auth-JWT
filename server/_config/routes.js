@@ -1,12 +1,17 @@
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+const express = require('express');
 
 const JwtStrategy = require('passport-jwt').Strategy;
 const { ExtractJwt } = require('passport-jwt');
 
 const User = require('../users/User');
 const secret = 'that is what I shared yesterday lol';
+
+
+
+
 
 const localStrategy = new LocalStrategy(function(username, password, done) {
   User.findOne({ username })
@@ -61,6 +66,7 @@ const passportOptions = { session: false };
 const authenticate = passport.authenticate('local', passportOptions);
 const protected = passport.authenticate('jwt', passportOptions);
 
+
 // helpers
 function makeToken(user) {
   const timestamp = new Date().getTime();
@@ -79,6 +85,24 @@ function makeToken(user) {
 // routes
 module.exports = function(server) {
 
+
+
+
+
+  server.get('/api/users', protected, (req, res) => {
+
+    User.find()
+        .select('username')
+        .then(users => {
+            res.json(users);
+        })
+        .catch(err => {
+            res.status(500).json(err);
+        });
+});
+
+
+
   server.get('/', function(req, res) {
     res.send({ api: 'up and running' });
   });
@@ -94,18 +118,14 @@ module.exports = function(server) {
 
   server.post('/api/login', authenticate, (req, res) => {
     // if we're here the user logged in correctly
+
     res.status(200).json({ token: makeToken(req.user), user: req.user });
   });
 
 
-  server.get('/api/users', protected, (req, res) => {
-    User.find()
-      .select('username')
-      .then(users => {
-        res.json(users);
-      })
-      .catch(err => {
-        res.status(500).json(err);
-      });
-  });
+
+
+
+
+
 }
